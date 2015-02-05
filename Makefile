@@ -1,4 +1,4 @@
-TARGETS =
+TARGETS = net.o
 
 all: $(TARGETS)
 
