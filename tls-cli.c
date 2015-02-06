@@ -25,7 +25,7 @@ int main (int argc, char *argv[])
 	if (cred == NULL)
 		die ("cannot initialize credentials");
 
-	if ((fd = net_connect (SOCK_STREAM, "0", "12345")) < 0)
+	if ((fd = net_connect (SOCK_STREAM, NULL, "12345")) < 0)
 		die ("cannot open raw connection");
 
 	if ((c = tls_open (fd, cred, 0)) == NULL)
