@@ -1,3 +1,5 @@
+CFLAGS += -ggdb
+
 TARGETS = net.o tls.o
 TARGETS += test
 
