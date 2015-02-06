@@ -1,2 +1,4 @@
 *.o
 *.swp
+tls-cli
+tls-srv
