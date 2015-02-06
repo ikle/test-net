@@ -19,76 +19,68 @@ void tls_fini (void)
 }
 
 /* server credentials */
-struct tls_server_cred {
-	gnutls_psk_server_credentials_t cred;
-};
+static gnutls_psk_server_credentials_t
+tls_server_cred_to_gnutls (struct tls_server_cred *c)
+{
+	return (void *) c;
+}
 
 struct tls_server_cred *tls_server_cred_open (const char *password_file)
 {
-	struct tls_server_cred *c;
+	gnutls_psk_server_credentials_t cred;
 
-	if ((c = malloc (sizeof (*c))) == NULL)
-		goto no_object;
-
-	if (gnutls_psk_allocate_server_credentials (&c->cred) != 0)
+	if (gnutls_psk_allocate_server_credentials (&cred) != 0)
 		goto no_cred;
 
-	if (gnutls_psk_set_server_credentials_file (c->cred,
+	if (gnutls_psk_set_server_credentials_file (cred,
 						    password_file) != 0)
 		goto no_init_cred;
 
-	return c;
+	return (void *) cred;
 no_init_cred:
-	gnutls_psk_free_server_credentials (c->cred);
+	gnutls_psk_free_server_credentials (cred);
 no_cred:
-	free (c);
-no_object:
 	return NULL;
 }
 
 void tls_server_cred_close (struct tls_server_cred *c)
 {
-	gnutls_psk_free_server_credentials (c->cred);
-	free (c);
+	gnutls_psk_free_server_credentials (tls_server_cred_to_gnutls (c));
 }
 
 /* client credentials */
-struct tls_client_cred {
-	gnutls_psk_client_credentials_t cred;
-};
+static gnutls_psk_client_credentials_t
+tls_client_cred_to_gnutls (struct tls_client_cred *c)
+{
+	return (void *) c;
+}
 
 struct tls_client_cred *tls_client_cred_open (const char *name,
 					      const char *key)
 {
-	struct tls_client_cred *c;
+	gnutls_psk_client_credentials_t cred;
 	gnutls_datum_t k;
 
-	if ((c = malloc (sizeof (*c))) == NULL)
-		goto no_object;
-
-	if (gnutls_psk_allocate_client_credentials (&c->cred) != 0)
+	if (gnutls_psk_allocate_client_credentials (&cred) != 0)
 		goto no_cred;
 
 	k.size = strlen (key);
 	k.data = (void *) key;
 
-	if (gnutls_psk_set_client_credentials (c->cred, name, &k,
+	if (gnutls_psk_set_client_credentials (cred, name, &k,
 					       GNUTLS_PSK_KEY_HEX) != 0)
 		goto no_init_cred;
 
-	return c;
+	return (void *) cred;
 no_init_cred:
-	gnutls_psk_free_client_credentials (c->cred);
+	gnutls_psk_free_client_credentials (cred);
 no_cred:
-	free (c);
-no_object:
 	return NULL;
 }
 
 void tls_client_cred_close (struct tls_client_cred *c)
 {
-	gnutls_psk_free_client_credentials (c->cred);
-	free (c);
+	gnutls_psk_free_client_credentials (tls_client_cred_to_gnutls (c));
 }
 
 /* connection object */
@@ -111,7 +103,6 @@ static ssize_t tls_data_pull (gnutls_transport_ptr_t ptr,
 struct tls *tls_open (int fd, void *cred, int passive)
 {
 	struct tls *c;
-	struct { void *cred; } *pc = cred;
 	int res;
 	const char *error = NULL;
 
@@ -124,7 +115,7 @@ struct tls *tls_open (int fd, void *cred, int passive)
 
 //	gnutls_session_set_ptr (c->session, c);
 
-	if (gnutls_credentials_set (c->session, GNUTLS_CRD_PSK, pc->cred) != 0)
+	if (gnutls_credentials_set (c->session, GNUTLS_CRD_PSK, cred) != 0)
 		goto no_set_cred;
 
 	if (gnutls_priority_set_direct (c->session,
