@@ -1,4 +1,4 @@
-TARGETS = net.o
+TARGETS = net.o tls.o
 
 all: $(TARGETS)
 
