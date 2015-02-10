@@ -1,9 +1,9 @@
 CFLAGS += -ggdb
 
-TARGETS = net.o tls.o
+TARGETS = net.o tls.o tap.o
 TARGETS += test
 
-TESTS = tls-cli tls-srv
+TESTS = tls-cli tls-srv tap-tap
 
 all: $(TARGETS)
 
@@ -23,3 +23,5 @@ tls-cli: net.o tls.o
 
 tls-srv: CFLAGS += `pkg-config gnutls --cflags --libs`
 tls-srv: net.o tls.o
+
+tap-tap: tap-tap.o tap.o
