@@ -3,7 +3,7 @@ CFLAGS += -ggdb
 TARGETS = net.o tls.o tap.o
 TARGETS += test
 
-TESTS = tls-cli tls-srv tap-tap
+TESTS = tls-cli tls-srv tap-tap route-list
 
 all: $(TARGETS)
 
