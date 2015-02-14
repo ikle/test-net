@@ -14,7 +14,7 @@ static int route_fn (struct sockaddr *to, struct sockaddr *mask,
 	int s, status = 1;
 	struct rtentry e;
 
-	if ((s = socket (AF_INET, SOCK_DGRAM, 0)) == -1)
+	if ((s = socket (to->sa_family, SOCK_DGRAM, 0)) == -1)
 		return 0;
 
 	memset (&e, 0, sizeof (e));
