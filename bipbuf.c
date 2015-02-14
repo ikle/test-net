@@ -69,6 +69,13 @@ int bipbuf_is_empty (struct bipbuf *b)
 	return b->a_head == b->a_tail;
 }
 
+int bipbuf_is_full (struct bipbuf *b)
+{
+	return !b->is_a_active ?
+		b->b_tail == b->a_head :
+		b->a_tail == b->tail;
+}
+
 void *bipbuf_reserve (struct bipbuf *b, size_t *size)
 {
 	if (!b->is_a_active) {

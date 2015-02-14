@@ -34,6 +34,7 @@ struct bipbuf *bipbuf_alloc (size_t size);
 void bipbuf_free (struct bipbuf *b);
 
 int bipbuf_is_empty (struct bipbuf *b);
+int bipbuf_is_full  (struct bipbuf *b);
 
 /*
  * 1. Reserve region for writing, returns data pointer and room
