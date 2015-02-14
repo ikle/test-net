@@ -20,7 +20,7 @@ static int netif_request (const char *dev, int cmd, struct ifreq *ir)
 	if ((s = socket (AF_INET, SOCK_DGRAM, 0)) == -1)
 		goto no_socket;
 
-	strncpy (ir->ifr_name, dev, IFNAMSIZ);
+	snprintf (ir->ifr_name, IFNAMSIZ, "%s", dev);
 
 	if (ioctl (s, cmd, ir) == -1)
 		goto no_ioctl;
