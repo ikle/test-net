@@ -1,5 +1,9 @@
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <net/route.h>
+#include <unistd.h>
 
 #include "route.h"
 
@@ -31,4 +35,48 @@ int route_scan (int (*cb)(void *ctx, struct route_entry *e), void *ctx)
 out:
 	fclose (f);
 	return 1;
+}
+
+static int route_fn (struct sockaddr *to, struct sockaddr *mask,
+		     struct sockaddr *via, const char *dev, int fn)
+{
+	int s, status = 1;
+	struct rtentry e;
+
+	if ((s = socket (to->sa_family, SOCK_DGRAM, 0)) == -1)
+		return 0;
+
+	memset (&e, 0, sizeof (e));
+	memcpy (&e.rt_dst, to, sizeof (*to));
+
+	if (mask != NULL)
+		memcpy (&e.rt_genmask, mask, sizeof (*mask));
+	else
+		e.rt_flags |= RTF_HOST;
+
+	if (via != NULL) {
+		memcpy (&e.rt_gateway, via, sizeof (*via));
+		e.rt_flags += RTF_GATEWAY;
+	}
+
+	e.rt_dev = (char *) dev;
+	e.rt_flags |= RTF_UP;
+
+	if (ioctl (s, fn, &e) == -1)
+		status = 0;
+
+	close (s);
+	return status;
+}
+
+int route_add (struct sockaddr *to, struct sockaddr *mask,
+	       struct sockaddr *via, const char *dev)
+{
+	return route_fn (to, mask, via, dev, SIOCADDRT);
+}
+
+int route_del (struct sockaddr *to, struct sockaddr *mask,
+	       struct sockaddr *via, const char *dev)
+{
+	return route_fn (to, mask, via, dev, SIOCDELRT);
 }
