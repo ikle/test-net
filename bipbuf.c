@@ -99,8 +99,6 @@ void *bipbuf_reserve (struct bipbuf *b, size_t *size)
 
 void bipbuf_commit (struct bipbuf *b, size_t size)
 {
-	size_t a_avail, b_avail;
-
 	if (!b->is_a_active) {
 		b->b_tail += size;
 		assert (b->b_tail <= b->a_head);
@@ -110,10 +108,7 @@ void bipbuf_commit (struct bipbuf *b, size_t size)
 	b->a_tail += size;
 	assert (b->a_tail <= b->tail);
 
-	a_avail = bipbuf_get_a_avail (b);
-	b_avail = bipbuf_get_b_avail (b);
-
-	if (b_avail > a_avail)
+	if (bipbuf_get_b_avail (b) > bipbuf_get_a_avail (b))
 		b->is_a_active = 0;
 }
 
