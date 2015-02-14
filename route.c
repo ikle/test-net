@@ -37,6 +37,36 @@ out:
 	return 1;
 }
 
+struct route_buf {
+	char *data;
+	size_t size;
+};
+
+static int route_default_route_device_cb (void *ctx, struct route_entry *e)
+{
+	struct route_buf *dev = ctx;
+	struct in_addr dst;
+
+	dst.s_addr = e->dst;
+
+	if (dst.s_addr == INADDR_ANY) {
+		strncpy (dev->data, e->dev, dev->size);
+		return 0;
+	}
+
+	return 1;
+}
+
+int route_get_default_route_device (char *buf, size_t size)
+{
+	struct route_buf dev = {buf, size};
+
+	if (!route_scan (route_default_route_device_cb, &dev))
+		return 0;
+
+	return 1;
+}
+
 static int route_fn (struct sockaddr *to, struct sockaddr *mask,
 		     struct sockaddr *via, const char *dev, int fn)
 {

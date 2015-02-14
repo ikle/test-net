@@ -11,6 +11,7 @@ struct route_entry {
 };
 
 int route_scan (int (*cb)(void *ctx, struct route_entry *e), void *ctx);
+int route_get_default_route_device (char *buf, size_t size);
 
 int route_add (struct sockaddr *to, struct sockaddr *mask,
 	       struct sockaddr *via, const char *dev);
