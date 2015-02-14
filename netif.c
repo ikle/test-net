@@ -60,6 +60,26 @@ int netif_get_hwaddress (const char *dev, struct sockaddr *hwaddr)
 	return netif_request_addr (dev, SIOCGIFHWADDR, hwaddr);
 }
 
+static int netif_send_addr (const char *dev, int cmd,
+			    const struct sockaddr *addr)
+{
+	struct ifreq ir;
+
+	ir.ifr_addr = *addr;
+
+	return netif_request (dev, cmd, &ir);
+}
+
+int netif_set_address (const char *dev, const struct sockaddr *addr)
+{
+	return netif_send_addr (dev, SIOCSIFADDR, addr);
+}
+
+int netif_set_netmask (const char *dev, const struct sockaddr *mask)
+{
+	return netif_send_addr (dev, SIOCSIFNETMASK, mask);
+}
+
 /* IPv4 network mask to CIDR format conversion helper */
 typedef uint_least32_t u32;
 
