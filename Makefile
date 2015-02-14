@@ -25,3 +25,5 @@ tls-srv: CFLAGS += `pkg-config gnutls --cflags --libs`
 tls-srv: net.o tls.o
 
 tap-tap: tap-tap.o tap.o
+
+route-list: route.o

@@ -6,6 +6,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#include "route.h"
+
 typedef uint_least32_t u32;
 
 static int ip_cmp (const void *A, const void *B)
@@ -37,42 +39,6 @@ static int netmask_to_cidr (u32 m)
 	}
 
 	return p - table + 1;
-}
-
-struct route_entry {
-	char dev[16];
-	unsigned long dst, mask, gw;
-	int flags, refs, use, metric, mtu, window, irtt;
-};
-
-int route_scan (int (*cb)(void *ctx, struct route_entry *e), void *ctx)
-{
-	FILE *f;
-	struct route_entry e;
-	int n;
-
-	if ((f = fopen ("/proc/net/route", "r")) == NULL)
-		return 0;
-
-	/* skip header */
-	while (!feof (f) && fgetc (f) != '\n') {}
-
-	while (!feof (f)) {
-		n = fscanf (f, "%15s %lx %lx %x %d %d %d %lx %d %d %d \n",
-			    e.dev, &e.dst, &e.gw, &e.flags, &e.refs, &e.use,
-			    &e.metric, &e.mask, &e.mtu, &e.window, &e.irtt);
-		if (n != 11) {
-			errno = EPROTO;
-			goto out;
-		}
-
-		if (!cb (ctx, &e))
-			break;
-
-	}
-out:
-	fclose (f);
-	return 1;
 }
 
 static int route_print_cb (void *ctx, struct route_entry *e)
