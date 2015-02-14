@@ -64,6 +64,16 @@ void bipbuf_free (struct bipbuf *b)
 	free (b);
 }
 
+static size_t bipbuf_get_a_avail (struct bipbuf *b)
+{
+	return b->tail - b->a_tail;
+}
+
+static size_t bipbuf_get_b_avail (struct bipbuf *b)
+{
+	return b->a_head - b->b_tail;
+}
+
 int bipbuf_is_empty (struct bipbuf *b)
 {
 	return b->a_head == b->a_tail;
@@ -72,18 +82,18 @@ int bipbuf_is_empty (struct bipbuf *b)
 int bipbuf_is_full (struct bipbuf *b)
 {
 	return !b->is_a_active ?
-		b->b_tail == b->a_head :
-		b->a_tail == b->tail;
+		bipbuf_get_b_avail (b) == 0 :
+		bipbuf_get_a_avail (b) == 0;
 }
 
 void *bipbuf_reserve (struct bipbuf *b, size_t *size)
 {
 	if (!b->is_a_active) {
-		*size = b->a_head - b->b_tail;
+		*size = bipbuf_get_b_avail (b);
 		return b->b_tail;
 	}
 
-	*size = b->tail - b->a_tail;
+	*size = bipbuf_get_a_avail (b);
 	return b->a_tail;
 }
 
@@ -100,8 +110,8 @@ void bipbuf_commit (struct bipbuf *b, size_t size)
 	b->a_tail += size;
 	assert (b->a_tail <= b->tail);
 
-	a_avail = b->tail - b->a_tail;
-	b_avail = b->a_head - b->head;
+	a_avail = bipbuf_get_a_avail (b);
+	b_avail = bipbuf_get_b_avail (b);
 
 	if (b_avail > a_avail)
 		b->is_a_active = 0;
