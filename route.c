@@ -50,7 +50,7 @@ static int route_default_route_device_cb (void *ctx, struct route_entry *e)
 	dst.s_addr = e->dst;
 
 	if (dst.s_addr == INADDR_ANY) {
-		strncpy (dev->data, e->dev, dev->size);
+		snprintf (dev->data, dev->size, "%s", e->dev);
 		return 0;
 	}
 
