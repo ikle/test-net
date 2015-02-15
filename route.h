@@ -19,4 +19,7 @@ int route_add (struct sockaddr *to, struct sockaddr *mask,
 int route_del (struct sockaddr *to, struct sockaddr *mask,
 	       struct sockaddr *via, const char *dev);
 
+int route_add_from_string (const char *to, const char *via, const char *dev);
+int route_del_from_string (const char *to, const char *via, const char *dev);
+
 #endif  /* ROUTE_H */

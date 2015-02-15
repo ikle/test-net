@@ -27,9 +27,9 @@ tls-srv: net.o tls.o
 
 tap-tap: tap-tap.o tap.o
 
-route-list: route.o
-route-edit: route.o
-route-default-device: route.o
+route-list: route.o net-util.o
+route-edit: route.o net-util.o
+route-default-device: route.o net-util.o
 
 netif-info: netif.o net-util.o
 netif-set:  netif.o net-util.o

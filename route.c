@@ -6,6 +6,7 @@
 #include <unistd.h>
 
 #include "route.h"
+#include "net-util.h"
 
 int route_scan (int (*cb)(void *ctx, struct route_entry *e), void *ctx)
 {
@@ -109,4 +110,36 @@ int route_del (struct sockaddr *to, struct sockaddr *mask,
 	       struct sockaddr *via, const char *dev)
 {
 	return route_fn (to, mask, via, dev, SIOCDELRT);
+}
+
+static int route_fn_from_string (const char *to, const char *via,
+				 const char *dev, int fn)
+{
+	struct sockaddr sa_to, sa_mask, sa_via;
+	int n;
+
+	n = net_address_aton (to, &sa_to, &sa_mask);
+	if (n < 1 || n > 2)
+		return 0;
+
+	if (via != NULL && net_address_aton (via, &sa_via, NULL) == 0)
+			return 0;
+
+	return route_fn (&sa_to,
+			 n == 2 ? &sa_mask : NULL,
+			 via != NULL ? &sa_via : NULL,
+			 dev, fn);
+no_format:
+	errno = EINVAL;
+	return 0;
+}
+
+int route_add_from_string (const char *to, const char *via, const char *dev)
+{
+	return route_fn_from_string (to, via, dev, SIOCADDRT);
+}
+
+int route_del_from_string (const char *to, const char *via, const char *dev)
+{
+	return route_fn_from_string (to, via, dev, SIOCDELRT);
 }
