@@ -148,26 +148,22 @@ void tls_close (struct tls *c)
 	gnutls_deinit (c->session);
 }
 
-static int tls_recover (struct tls *c, int error)
-{
-	if (error == GNUTLS_E_REHANDSHAKE) {
-		while ((error = gnutls_handshake (c->session)) != 0)
-			if (gnutls_error_is_fatal (error))
-				return 0;
-
-		return 1;
-	}
-
-	return !gnutls_error_is_fatal (error);
-}
-
 ssize_t tls_send (struct tls *c, const void *data, size_t size)
 {
 	ssize_t res;
 
-	do
+	do {
 		res = gnutls_record_send (c->session, data, size);
-	while (res < 0 && tls_recover (c, res));
+
+		if (res == GNUTLS_E_REHANDSHAKE)
+			res = gnutls_handshake (c->session);
+
+		if (res == GNUTLS_E_AGAIN) {
+			errno = EAGAIN;
+			return res;
+		}
+	}
+	while (res < 0 && !gnutls_error_is_fatal (res));
 
 	return res;
 }
@@ -176,9 +172,18 @@ ssize_t tls_recv (struct tls *c, void *data, size_t size)
 {
 	ssize_t res;
 
-	do
+	do {
 		res = gnutls_record_recv (c->session, data, size);
-	while (res < 0 && tls_recover (c, res));
+
+		if (res == GNUTLS_E_REHANDSHAKE)
+			res = gnutls_handshake (c->session);
+
+		if (res == GNUTLS_E_AGAIN) {
+			errno = EAGAIN;
+			return res;
+		}
+	}
+	while (res < 0 && !gnutls_error_is_fatal (res));
 
 	return res;
 }
