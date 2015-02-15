@@ -7,3 +7,4 @@ route-list
 route-edit
 route-default-device
 netif-test
+netif-info

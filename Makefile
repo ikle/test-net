@@ -4,7 +4,7 @@ TARGETS = net.o tls.o tap.o bipbuf.o route.o netif.o
 TARGETS += test
 
 TESTS = tls-cli tls-srv tap-tap route-list route-edit route-default-device
-TESTS += netif-test
+TESTS += netif-test netif-info
 
 all: $(TARGETS)
 
@@ -30,3 +30,5 @@ tap-tap: tap-tap.o tap.o
 route-list: route.o
 route-edit: route.o
 route-default-device: route.o
+
+netif-info: netif.o
