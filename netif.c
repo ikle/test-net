@@ -12,6 +12,7 @@
 #include <unistd.h>
 
 #include "netif.h"
+#include "net-util.h"
 
 static int netif_request (const char *dev, int cmd, struct ifreq *ir)
 {
@@ -148,23 +149,14 @@ int netif_get_hwaddress_string (const char *dev, char *buf, size_t size)
 /* Set address and network mask from string in CIDR format */
 int netif_set_address_string (const char *dev, const char *addr)
 {
-	unsigned a, b, c, d, m;
-	struct sockaddr_in sa;
+	struct sockaddr sa, sm;
+	int n;
 
-	if (sscanf (addr, "%u.%u.%u.%u/%u", &a, &b, &c, &d, &m) != 5 ||
-	    a > 255 || b > 255 || c > 255 || d > 255 || m > 32) {
-		errno = EINVAL;
-		return 0;
-	}
+	n = net_address_aton (addr, &sa, &sm);
 
-	sa.sin_family = AF_INET;
-	sa.sin_addr.s_addr = a | b << 8 | c << 16 | d << 24;
-
-	if (!netif_set_address (dev, (void *) &sa))
+	if (n < 1 ||
+	    !netif_set_address (dev, &sa))
 		return 0;
 
-	sa.sin_family = AF_INET;
-	sa.sin_addr.s_addr = htonl (0xffffffffL << (32 - m));
-
-	return netif_set_netmask (dev, (void *) &sa);
+	return n == 1 ? 1 : netif_set_netmask (dev, &sm);
 }

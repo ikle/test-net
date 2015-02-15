@@ -31,5 +31,5 @@ route-list: route.o
 route-edit: route.o
 route-default-device: route.o
 
-netif-info: netif.o
-netif-set:  netif.o
+netif-info: netif.o net-util.o
+netif-set:  netif.o net-util.o
