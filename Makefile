@@ -1,4 +1,11 @@
+ifdef CROSS_PREFIX
+CC = $(CROSS_PREFIX)gcc
+LD = $(CROSS_PREFIX)ld
+AR = $(CROSS_PREFIX)ar
+RANLIB = $(CROSS_PREFIX)ranlib
+else
 RANLIB ?= ranlib
+endif
 
 CFLAGS += -ggdb
 
