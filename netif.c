@@ -144,3 +144,27 @@ int netif_get_hwaddress_string (const char *dev, char *buf, size_t size)
 	return snprintf (buf, size, "%02x:%02x:%02x:%02x:%02x:%02x",
 			 mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 }
+
+/* Set address and network mask from string in CIDR format */
+int netif_set_address_string (const char *dev, const char *addr)
+{
+	unsigned a, b, c, d, m;
+	struct sockaddr_in sa;
+
+	if (sscanf (addr, "%u.%u.%u.%u/%u", &a, &b, &c, &d, &m) != 5 ||
+	    a > 255 || b > 255 || c > 255 || d > 255 || m > 32) {
+		errno = EINVAL;
+		return 0;
+	}
+
+	sa.sin_family = AF_INET;
+	sa.sin_addr.s_addr = a | b << 8 | c << 16 | d << 24;
+
+	if (!netif_set_address (dev, (void *) &sa))
+		return 0;
+
+	sa.sin_family = AF_INET;
+	sa.sin_addr.s_addr = htonl (0xffffffffL << (32 - m));
+
+	return netif_set_netmask (dev, (void *) &sa);
+}
