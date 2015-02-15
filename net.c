@@ -28,6 +28,7 @@
 #include "net.h"
 
 #include <errno.h>
+#include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
 
@@ -171,4 +172,25 @@ int net_listen (int type, const char *node, const char *service)
 
 	freeaddrinfo (res);
 	return s;
+}
+
+/*
+ * The function net_set_blocking sets file to blocking or non-blocking mode.
+ *
+ * On success non-zero is returned. On error zero is returned and errno is
+ * set appropriately.
+ */
+int net_set_blocking (int fd, int blocking)
+{
+	int flags;
+
+	if ((flags = fcntl (fd, F_GETFL)) == -1)
+		return 0;
+
+	if (blocking)
+		flags &= ~O_NONBLOCK;
+	else
+		flags |=  O_NONBLOCK;
+
+	return fcntl (fd, F_SETFL, flags) != -1;
 }

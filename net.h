@@ -55,4 +55,12 @@ int net_connect (int type, const char *node, const char *service);
  */
 int net_listen (int type, const char *node, const char *service);
 
+/*
+ * The function net_set_blocking sets file to blocking or non-blocking mode.
+ *
+ * On success non-zero is returned. On error zero is returned and errno is
+ * set appropriately.
+ */
+int net_set_blocking (int fd, int blocking);
+
 #endif /* _IKLE_NET_H */
