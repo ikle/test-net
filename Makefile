@@ -1,6 +1,6 @@
 CFLAGS += -ggdb
 
-TARGETS = net.o tls.o tap.o bipbuf.o route.o netif.o
+TARGETS = net.o tls.o tap.o bipbuf.o route.o netif.o net-util.o
 TARGETS += test
 
 TESTS = tls-cli tls-srv tap-tap route-list route-edit route-default-device
