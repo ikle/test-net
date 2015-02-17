@@ -10,7 +10,7 @@ int main (int argc, char *argv[])
 		return 1;
 	}
 
-	if (!netif_set_address_string (argv[1], argv[2])) {
+	if (!netif_set_address_from_string (argv[1], argv[2])) {
 		perror ("netif-set");
 		return 1;
 	}

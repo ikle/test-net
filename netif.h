@@ -19,6 +19,6 @@ int netif_get_address_string (const char *dev, char *buf, size_t size);
 int netif_get_hwaddress_string (const char *dev, char *buf, size_t size);
 
 /* Set address and network mask from string in CIDR format */
-int netif_set_address_string (const char *dev, const char *addr);
+int netif_set_address_from_string (const char *dev, const char *addr);
 
 #endif  /* NETIF_H */
