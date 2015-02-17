@@ -144,6 +144,9 @@ no_tls:
 
 void tls_close (struct tls *c)
 {
+	if (c == NULL)
+		return;
+
 	gnutls_bye (c->session, GNUTLS_SHUT_RDWR);
 	gnutls_deinit (c->session);
 }
