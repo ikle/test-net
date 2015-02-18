@@ -1,8 +1,6 @@
 #ifndef TUNTAP_H
 #define TUNTAP_H  1
 
-#include <net/if.h>		/* IF_NAMESIZE/IFNAMESIZ */
-
 /*
  * DESCRIPTION: allocate tap tunnel
  * RETURN VALUE:
@@ -18,6 +16,6 @@
  *
  * NOTE: MAC address of tap device is 00:FF:ab:cd:ef:gh, where a-h random numbers
  */
-int tuntap_alloc (const char *template, char *name);
+int tuntap_alloc (const char *template, char *name, size_t size);
 
 #endif /* TUNTAP_H */

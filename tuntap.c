@@ -14,7 +14,7 @@
 
 #include "tuntap.h"
 
-int tuntap_alloc (const char *template, char *name)
+int tuntap_alloc (const char *template, char *name, size_t size)
 {
 	int fd;
 	struct ifreq ifr;
@@ -36,10 +36,8 @@ int tuntap_alloc (const char *template, char *name)
 		return -1;
 	}
 
-	if (name != NULL) {
-		strncpy (name, ifr.ifr_name, IFNAMSIZ);
-		name[IFNAMSIZ] = '\0';
-	}
+	if (name != NULL)
+		snprintf (name, size, "%s", ifr.ifr_name);
 
 	return fd;
 }
