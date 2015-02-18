@@ -30,9 +30,7 @@ int tuntap_alloc (const char *template, char *name, size_t size)
 		strncpy (ifr.ifr_name, template, IFNAMSIZ);
 
 	if (ioctl (fd, TUNSETIFF, &ifr) == -1) {
-		int err = errno;	/* save errno */
-		close (fd);			/* from close error */
-		errno = err;		/* & restore it */
+		close (fd);
 		return -1;
 	}
 
