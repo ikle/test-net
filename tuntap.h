@@ -1,5 +1,5 @@
-#ifndef __TAP_H
-#define __TAP_H 1
+#ifndef TUNTAP_H
+#define TUNTAP_H  1
 
 #include <net/if.h>		/* IF_NAMESIZE/IFNAMESIZ */
 
@@ -18,6 +18,6 @@
  *
  * NOTE: MAC address of tap device is 00:FF:ab:cd:ef:gh, where a-h random numbers
  */
-int tap_alloc (const char *name, char *ret_name);
+int tuntap_alloc (const char *name, char *ret_name);
 
-#endif /* __TAP_H */
+#endif /* TUNTAP_H */

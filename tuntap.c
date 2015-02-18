@@ -12,9 +12,9 @@
 
 #include <linux/if_tun.h>
 
-#include "tap.h"
+#include "tuntap.h"
 
-int tap_alloc (const char *name, char *ret_name)
+int tuntap_alloc (const char *name, char *ret_name)
 {
 	int fd;
 	struct ifreq ifr;

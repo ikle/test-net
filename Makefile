@@ -9,7 +9,7 @@ endif
 
 CFLAGS += -ggdb
 
-TARGETS = libnet.a tap.o
+TARGETS = libnet.a tuntap.o
 TARGETS += test
 
 NET_OBJECTS = net.o tls.o bipbuf.o route.o netif.o net-util.o
