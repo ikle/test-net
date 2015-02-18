@@ -25,9 +25,9 @@ int tuntap_alloc (const char *template, char *name, size_t size)
 	ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
 
 	if (template == NULL || *template == '\0')
-		strncpy (ifr.ifr_name, "tap%d", IFNAMSIZ);
-	else
-		strncpy (ifr.ifr_name, template, IFNAMSIZ);
+		template = "tap%d";
+
+	snprintf (ifr.ifr_name, IFNAMSIZ, "%s", template);
 
 	if (ioctl (fd, TUNSETIFF, &ifr) == -1) {
 		close (fd);
