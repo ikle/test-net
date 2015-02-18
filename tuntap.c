@@ -14,7 +14,7 @@
 
 #include "tuntap.h"
 
-int tuntap_alloc (const char *template, char *name, size_t size)
+int tuntap_alloc (const char *template, int ll, char *name, size_t size)
 {
 	int fd;
 	struct ifreq ifr;
@@ -22,10 +22,10 @@ int tuntap_alloc (const char *template, char *name, size_t size)
 	if ((fd = open ("/dev/net/tun", O_RDWR)) == -1)
 		return -1;
 
-	ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
+	ifr.ifr_flags = (ll ? IFF_TAP : IFF_TUN) | IFF_NO_PI;
 
 	if (template == NULL || *template == '\0')
-		template = "tap%d";
+		template = ll ? "tap%d" : "tun%d";
 
 	snprintf (ifr.ifr_name, IFNAMSIZ, "%s", template);
 
