@@ -22,19 +22,6 @@ int tuntap_alloc (const char *name, char *ret_name)
 	if ((fd = open ("/dev/net/tun", O_RDWR)) == -1)
 		return -1;
 
-/*	memset (&ifr, 0, sizeof (ifr)); */
-	/*
-		Flags:
-
-		IFF_TUN   - TUN device (no Ethernet headers)
-		IFF_TAP   - TAP device
-		IFF_NO_PI - Do not provide packet information
-
-		If flag IFF_NO_PI is not set each frame format is:
-		Flags [2 bytes]
-		Proto [2 bytes]
-		Raw protocol (IP, IPv6, etc) frame.
-	*/
 	ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
 
 	if (name == NULL || *name == '\0')
