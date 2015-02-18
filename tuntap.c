@@ -1,10 +1,6 @@
-#include <errno.h>
 #include <stdio.h>
-#include <string.h>
 
 #include <sys/ioctl.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <net/if.h>
 
 #include <fcntl.h>
