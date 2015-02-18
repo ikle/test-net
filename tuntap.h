@@ -18,6 +18,6 @@
  *
  * NOTE: MAC address of tap device is 00:FF:ab:cd:ef:gh, where a-h random numbers
  */
-int tuntap_alloc (const char *name, char *ret_name);
+int tuntap_alloc (const char *template, char *name);
 
 #endif /* TUNTAP_H */

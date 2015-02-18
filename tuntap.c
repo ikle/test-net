@@ -14,7 +14,7 @@
 
 #include "tuntap.h"
 
-int tuntap_alloc (const char *name, char *ret_name)
+int tuntap_alloc (const char *template, char *name)
 {
 	int fd;
 	struct ifreq ifr;
@@ -24,10 +24,10 @@ int tuntap_alloc (const char *name, char *ret_name)
 
 	ifr.ifr_flags = IFF_TAP | IFF_NO_PI;
 
-	if (name == NULL || *name == '\0')
+	if (template == NULL || *template == '\0')
 		strncpy (ifr.ifr_name, "tap%d", IFNAMSIZ);
 	else
-		strncpy (ifr.ifr_name, name, IFNAMSIZ);
+		strncpy (ifr.ifr_name, template, IFNAMSIZ);
 
 	if (ioctl (fd, TUNSETIFF, &ifr) == -1) {
 		int err = errno;	/* save errno */
@@ -36,9 +36,9 @@ int tuntap_alloc (const char *name, char *ret_name)
 		return -1;
 	}
 
-	if (ret_name != NULL) {
-		strncpy (ret_name, ifr.ifr_name, IFNAMSIZ);
-		ret_name[IFNAMSIZ] = '\0';
+	if (name != NULL) {
+		strncpy (name, ifr.ifr_name, IFNAMSIZ);
+		name[IFNAMSIZ] = '\0';
 	}
 
 	return fd;
