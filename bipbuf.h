@@ -37,20 +37,20 @@ int bipbuf_is_empty (struct bipbuf *b);
 int bipbuf_is_full  (struct bipbuf *b);
 
 /*
- * 1. Reserve region for writing, returns data pointer and room
- *    available in buffer for writing.
+ * 1. Reserve a region for writing: get a pointer to the buffer alongside
+ *    with a room available for writing.
  * 2. Write some data into region.
- * 3. Commit written data, size should be less or equal reserved region
- *    size.
+ * 3. Commit the written data. The size should be less or equal to the
+ *    reserved region size.
  */
 void *bipbuf_reserve (struct bipbuf *b, size_t *size);
 void  bipbuf_commit  (struct bipbuf *b, size_t  size);
 
 /*
- * 1. Request region for reading, returns data pointer and room
- *    available in buffer for reading.
+ * 1. Request a region for reading: get a pointer to the buffer alongside
+ *    with a room available for reading.
  * 2. Read same data from requested region.
- * 3. Release readed data, size should be less or equal requested
+ * 3. Release readed data. The size should be less or equal to the requested
  *    region size.
  */
 void *bipbuf_request (struct bipbuf *b, size_t *size);
