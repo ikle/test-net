@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "tap.h"
+#include "tuntap.h"
 
 static void die (const char *reason)
 {
@@ -14,18 +14,18 @@ static void die (const char *reason)
 int main (int argc, char* argv[])
 {
 	int fd0, fd1;
-	char name[IFNAMSIZ + 1];
+	char name[16];
 
 	fprintf (stderr, "Creating tap device - ");
 
-	if ((fd0 = tap_alloc ("tap0", name)) == -1)
+	if ((fd0 = tuntap_alloc (NULL, 1, name, sizeof (name))) == -1)
 		die ("tap0 allocation");
 
 	fprintf (stderr, "%s, ok\n", name);
 
 	fprintf (stderr, "Creating tap device - ");
 
-	if ((fd1 = tap_alloc ("tap1", name)) == -1 ) {
+	if ((fd1 = tuntap_alloc (NULL, 1, name, sizeof (name))) == -1 ) {
 		close (fd0);
 		die ("tap1 allocation");
 	}

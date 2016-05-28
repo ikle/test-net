@@ -40,7 +40,7 @@ tls-cli: libnet.a
 tls-srv: CFLAGS += `pkg-config gnutls --cflags --libs`
 tls-srv: libnet.a
 
-tap-tap: tap-tap.o tap.o
+tap-tap: tap-tap.o tuntap.o
 
 route-list: libnet.a
 route-edit: libnet.a
