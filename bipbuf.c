@@ -8,6 +8,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+
 #include "bipbuf.h"
 
 struct bipbuf {
@@ -17,99 +18,99 @@ struct bipbuf {
 
 struct bipbuf *bipbuf_alloc (size_t size)
 {
-	struct bipbuf *b;
+	struct bipbuf *o;
 
-	if ((b = malloc (sizeof (*b))) == NULL)
+	if ((o = malloc (sizeof (*o))) == NULL)
 		goto no_object;
 
-	if ((b->head = malloc (size)) == NULL)
+	if ((o->head = malloc (size)) == NULL)
 		goto no_buffer;
 
-	b->tail = b->head + size;
-	b->a_head = b->a_tail = b->b_tail = b->head;
-	b->is_a_active = 1;
-	return b;
+	o->tail = o->head + size;
+	o->a_head = o->a_tail = o->b_tail = o->head;
+	o->is_a_active = 1;
+	return o;
 
 no_buffer:
-	free (b);
+	free (o);
 no_object:
 	return NULL;
 }
 
-void bipbuf_free (struct bipbuf *b)
+void bipbuf_free (struct bipbuf *o)
 {
-	if (b == NULL)
+	if (o == NULL)
 		return;
 
-	free (b->head);
-	free (b);
+	free (o->head);
+	free (o);
 }
 
-static size_t bipbuf_get_a_avail (struct bipbuf *b)
+static size_t bipbuf_get_a_avail (struct bipbuf *o)
 {
-	return b->tail - b->a_tail;
+	return o->tail - o->a_tail;
 }
 
-static size_t bipbuf_get_b_avail (struct bipbuf *b)
+static size_t bipbuf_get_b_avail (struct bipbuf *o)
 {
-	return b->a_head - b->b_tail;
+	return o->a_head - o->b_tail;
 }
 
-int bipbuf_is_empty (struct bipbuf *b)
+int bipbuf_is_empty (struct bipbuf *o)
 {
-	return b->a_head == b->a_tail;
+	return o->a_head == o->a_tail;
 }
 
-int bipbuf_is_full (struct bipbuf *b)
+int bipbuf_is_full (struct bipbuf *o)
 {
-	return !b->is_a_active ?
-		bipbuf_get_b_avail (b) == 0 :
-		bipbuf_get_a_avail (b) == 0;
+	return !o->is_a_active ?
+		bipbuf_get_b_avail (o) == 0 :
+		bipbuf_get_a_avail (o) == 0;
 }
 
-void *bipbuf_reserve (struct bipbuf *b, size_t *size)
+void *bipbuf_reserve (struct bipbuf *o, size_t *size)
 {
-	if (!b->is_a_active) {
-		*size = bipbuf_get_b_avail (b);
-		return b->b_tail;
+	if (!o->is_a_active) {
+		*size = bipbuf_get_b_avail (o);
+		return o->b_tail;
 	}
 
-	*size = bipbuf_get_a_avail (b);
-	return b->a_tail;
+	*size = bipbuf_get_a_avail (o);
+	return o->a_tail;
 }
 
-void bipbuf_commit (struct bipbuf *b, size_t size)
+void bipbuf_commit (struct bipbuf *o, size_t size)
 {
-	if (!b->is_a_active) {
-		b->b_tail += size;
-		assert (b->b_tail <= b->a_head);
+	if (!o->is_a_active) {
+		o->b_tail += size;
+		assert (o->b_tail <= o->a_head);
 		return;
 	}
 
-	b->a_tail += size;
-	assert (b->a_tail <= b->tail);
+	o->a_tail += size;
+	assert (o->a_tail <= o->tail);
 
-	if (bipbuf_get_b_avail (b) > bipbuf_get_a_avail (b))
-		b->is_a_active = 0;
+	if (bipbuf_get_b_avail (o) > bipbuf_get_a_avail (o))
+		o->is_a_active = 0;
 }
 
-void *bipbuf_request (struct bipbuf *b, size_t *size)
+void *bipbuf_request (struct bipbuf *o, size_t *size)
 {
-	*size = b->a_tail - b->a_head;
-	return b->a_head;
+	*size = o->a_tail - o->a_head;
+	return o->a_head;
 }
 
-void bipbuf_release (struct bipbuf *b, size_t size)
+void bipbuf_release (struct bipbuf *o, size_t size)
 {
-	b->a_head += size;
-	assert (b->a_head <= b->a_tail);
+	o->a_head += size;
+	assert (o->a_head <= o->a_tail);
 
-	if (b->a_head < b->a_tail)  /* is A region not empty? */
+	if (o->a_head < o->a_tail)  /* is A region not empty? */
 		return;
 
 	/* move B region to A */
-	b->a_head = b->head;
-	b->a_tail = b->b_tail;
-	b->b_tail = b->head;
-	b->is_a_active = 1;
+	o->a_head = o->head;
+	o->a_tail = o->b_tail;
+	o->b_tail = o->head;
+	o->is_a_active = 1;
 }

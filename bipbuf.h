@@ -12,10 +12,10 @@
 #include <stddef.h>
 
 struct bipbuf *bipbuf_alloc (size_t size);
-void bipbuf_free (struct bipbuf *b);
+void bipbuf_free (struct bipbuf *o);
 
-int bipbuf_is_empty (struct bipbuf *b);
-int bipbuf_is_full  (struct bipbuf *b);
+int bipbuf_is_empty (struct bipbuf *o);
+int bipbuf_is_full  (struct bipbuf *o);
 
 /*
  * 1. Reserve a region for writing: get a pointer to the buffer alongside
@@ -24,8 +24,8 @@ int bipbuf_is_full  (struct bipbuf *b);
  * 3. Commit the written data. The size should be less or equal to the
  *    reserved region size.
  */
-void *bipbuf_reserve (struct bipbuf *b, size_t *size);
-void  bipbuf_commit  (struct bipbuf *b, size_t  size);
+void *bipbuf_reserve (struct bipbuf *o, size_t *size);
+void  bipbuf_commit  (struct bipbuf *o, size_t  size);
 
 /*
  * 1. Request a region for reading: get a pointer to the buffer alongside
@@ -34,7 +34,7 @@ void  bipbuf_commit  (struct bipbuf *b, size_t  size);
  * 3. Release readed data. The size should be less or equal to the requested
  *    region size.
  */
-void *bipbuf_request (struct bipbuf *b, size_t *size);
-void  bipbuf_release (struct bipbuf *b, size_t  size);
+void *bipbuf_request (struct bipbuf *o, size_t *size);
+void  bipbuf_release (struct bipbuf *o, size_t  size);
 
 #endif  /* _BIPBUF_H */
