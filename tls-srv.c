@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "net.h"
 #include "tls.h"
@@ -17,8 +18,6 @@ int main (int argc, char *argv[])
 	struct tls *c;
 
 	static const char hello[] = "Hello from tls-srv!\n";
-	ssize_t ret;
-	char buf[BUFSIZ];
 
 	tls_init ();
 
