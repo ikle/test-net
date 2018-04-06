@@ -49,7 +49,7 @@ void  bipbuf_commit  (struct bipbuf *b, size_t  size);
 /*
  * 1. Request a region for reading: get a pointer to the buffer alongside
  *    with a room available for reading.
- * 2. Read same data from requested region.
+ * 2. Read some data from requested region.
  * 3. Release readed data. The size should be less or equal to the requested
  *    region size.
  */
