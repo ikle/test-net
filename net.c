@@ -77,9 +77,9 @@ static int netdb_errno (int code)
  */
 static
 int net_socket (int type, const char *node, const char *service,
-		struct addrinfo **res, int passive)
+		struct addrinfo *res, int passive)
 {
-	struct addrinfo hints;
+	struct addrinfo hints, *list, *p;
 	int ret;
 
 	memset (&hints, 0, sizeof (hints));
@@ -92,19 +92,19 @@ int net_socket (int type, const char *node, const char *service,
 	if (passive)
 		hints.ai_flags |= AI_PASSIVE;
 
-	if ((ret = getaddrinfo (node, service, &hints, res)) != 0)
+	if ((ret = getaddrinfo (node, service, &hints, &list)) != 0)
 		return -netdb_errno (ret);
 
-	/* using first resource record element... */
-	ret = socket ((*res)->ai_family, (*res)->ai_socktype,
-		      (*res)->ai_protocol);
-	if (ret == -1)
-		goto no_socket;
+	for (p = list; p != NULL; p = p->ai_next) {
+		ret = socket (p->ai_family, p->ai_socktype, p->ai_protocol);
+		if (ret != -1) {
+			*res = *p;
+			freeaddrinfo (list);
+			return ret;
+		}
+	}
 
-	return ret;
-no_socket:
-	freeaddrinfo (*res);
-	*res = NULL;
+	freeaddrinfo (list);
 	return -errno;
 }
 
@@ -118,21 +118,19 @@ no_socket:
  */
 int net_connect (int type, const char *node, const char *service)
 {
-	struct addrinfo *res;
+	struct addrinfo res;
 	int s, saved_errno;
 
-	/* using first resource record element... */
+	/* using first available socket... */
 	if ((s = net_socket (type, node, service, &res, 0)) < 0)
 		return s;
 
-	if (connect (s, res->ai_addr, res->ai_addrlen) == -1) {
+	if (connect (s, res.ai_addr, res.ai_addrlen) == -1) {
 		saved_errno = errno;
-		freeaddrinfo (res);
 		close (s);
 		return -saved_errno;
 	}
 
-	freeaddrinfo (res);
 	return s;
 }
 
@@ -150,22 +148,20 @@ int net_connect (int type, const char *node, const char *service)
  */
 int net_listen (int type, const char *node, const char *service)
 {
-	struct addrinfo *res;
+	struct addrinfo res;
 	int s, saved_errno;
 
-	/* using first resource record element... */
+	/* using first available socket... */
 	if ((s = net_socket (type, node, service, &res, 1)) < 0)
 		return s;
 
-	if (bind (s, res->ai_addr, res->ai_addrlen) == -1 ||
+	if (bind (s, res.ai_addr, res.ai_addrlen) == -1 ||
 	    listen (s, 10) == -1) {
 		saved_errno = errno;
-		freeaddrinfo (res);
 		close (s);
 		return -saved_errno;
 	}
 
-	freeaddrinfo (res);
 	return s;
 }
 
