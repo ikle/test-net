@@ -6,16 +6,17 @@
  * SPDX-License-Identifier: BSD-2-Clause
  */
 
-#include "net.h"
-
 #include <errno.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include <string.h>
 
 #include <sys/types.h>
 #include <sys/socket.h>
+
+#include <fcntl.h>
 #include <netdb.h>
+#include <unistd.h>
+
+#include "net.h"
 
 #ifndef AI_IDN
 #define AI_IDN  0
