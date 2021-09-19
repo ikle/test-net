@@ -59,56 +59,6 @@ static int netdb_errno (int code)
 }
 
 /*
- * The function net_socket() translates the node and/or the service name,
- * and, on success, create the socket for the first found record.
- *
- * If passive in not zero and node is NULL, then the returned socket address
- * will contain the "wilcard address" suitable for bind(2)ing a socket that
- * will accept(2) connections.
- *
- * If passive is zero and node is NULL, then the network address will be set
- * to the loopback interface address.
- *
- * If the node/servise name resolution and socket creation succeeds, socket
- * and found resource list is returned. On error negative error code is
- * returned.
- *
- * Use freeaddrinfo() function to free returned resource list.
- */
-static
-int net_socket (int type, const char *node, const char *service,
-		struct addrinfo *res, int passive)
-{
-	struct addrinfo hints, *list, *p;
-	int ret;
-
-	memset (&hints, 0, sizeof (hints));
-
-	hints.ai_family   = AF_INET;
-	hints.ai_socktype = type;
-	hints.ai_protocol = 0;
-	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG | AI_IDN;
-
-	if (passive)
-		hints.ai_flags |= AI_PASSIVE;
-
-	if ((ret = getaddrinfo (node, service, &hints, &list)) != 0)
-		return -netdb_errno (ret);
-
-	for (p = list; p != NULL; p = p->ai_next) {
-		ret = socket (p->ai_family, p->ai_socktype, p->ai_protocol);
-		if (ret != -1) {
-			*res = *p;
-			freeaddrinfo (list);
-			return ret;
-		}
-	}
-
-	freeaddrinfo (list);
-	return -errno;
-}
-
-/*
  * The function net_connect() create the socket and connects it to the
  * address specified by node:service pair. If node is NULL, then the network
  * address will be set to the loopback interface address.
@@ -160,21 +110,33 @@ int net_connect (int type, const char *node, const char *service)
  */
 int net_listen (int type, const char *node, const char *service)
 {
-	struct addrinfo res;
-	int s, saved_errno;
+	struct addrinfo hints, *list, *p;
+	int s;
 
-	/* using first available socket... */
-	if ((s = net_socket (type, node, service, &res, 1)) < 0)
-		return s;
+	memset (&hints, 0, sizeof (hints));
 
-	if (bind (s, res.ai_addr, res.ai_addrlen) == -1 ||
-	    listen (s, 10) == -1) {
-		saved_errno = errno;
+	hints.ai_family   = AF_INET;
+	hints.ai_socktype = type;
+	hints.ai_protocol = 0;
+	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG | AI_IDN | AI_PASSIVE;
+
+	if ((s = getaddrinfo (node, service, &hints, &list)) != 0)
+		return -netdb_errno (s);
+
+	for (p = list; p != NULL; p = p->ai_next) {
+		s = socket (p->ai_family, p->ai_socktype, p->ai_protocol);
+		if (s != -1)
+			continue;
+
+		if (bind (s, p->ai_addr, p->ai_addrlen) != -1 &&
+		    listen (s, 10) != -1)
+			return s;
+
 		close (s);
-		return -saved_errno;
 	}
 
-	return s;
+	freeaddrinfo (list);
+	return -errno;
 }
 
 /*
