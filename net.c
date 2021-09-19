@@ -142,7 +142,7 @@ int net_connect (int type, const char *node, const char *service)
 }
 
 /*
- * The function net_socket() create the socket, bind it and mark a socket as
+ * The function net_listen() create the socket, bind it and mark a socket as
  * passive, that is, as a socket that will be used to accept incoming
  * connection request using accept(2).
  *
