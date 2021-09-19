@@ -83,10 +83,12 @@ int net_socket (int type, const char *node, const char *service,
 	int ret;
 
 	memset (&hints, 0, sizeof (hints));
-	hints.ai_family = AF_INET;
+
+	hints.ai_family   = AF_INET;
 	hints.ai_socktype = type;
 	hints.ai_protocol = 0;
-	hints.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG | AI_IDN;
+	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG | AI_IDN;
+
 	if (passive)
 		hints.ai_flags |= AI_PASSIVE;
 
