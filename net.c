@@ -118,20 +118,32 @@ int net_socket (int type, const char *node, const char *service,
  */
 int net_connect (int type, const char *node, const char *service)
 {
-	struct addrinfo res;
-	int s, saved_errno;
+	struct addrinfo hints, *list, *p;
+	int s;
 
-	/* using first available socket... */
-	if ((s = net_socket (type, node, service, &res, 0)) < 0)
-		return s;
+	memset (&hints, 0, sizeof (hints));
 
-	if (connect (s, res.ai_addr, res.ai_addrlen) == -1) {
-		saved_errno = errno;
+	hints.ai_family   = AF_INET;
+	hints.ai_socktype = type;
+	hints.ai_protocol = 0;
+	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG | AI_IDN;
+
+	if ((s = getaddrinfo (node, service, &hints, &list)) != 0)
+		return -netdb_errno (s);
+
+	for (p = list; p != NULL; p = p->ai_next) {
+		s = socket (p->ai_family, p->ai_socktype, p->ai_protocol);
+		if (s != -1)
+			continue;
+
+		if (connect (s, p->ai_addr, p->ai_addrlen) != -1)
+			return s;
+
 		close (s);
-		return -saved_errno;
 	}
 
-	return s;
+	freeaddrinfo (list);
+	return -errno;
 }
 
 /*
