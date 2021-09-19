@@ -46,13 +46,20 @@ static int netdb_errno (int code)
 	case EAI_BADFLAGS:
 		return EINVAL;
 	case EAI_NONAME:
+#ifdef EAI_NODATA
+	case EAI_NODATA:
+#endif
 		return EADDRNOTAVAIL;
 	case EAI_AGAIN:
 		return EAGAIN;
 	case EAI_FAIL:
 		return EPROTO;
 	case EAI_FAMILY:
+	case EAI_SOCKTYPE:
 	case EAI_SERVICE:
+#ifdef EAI_ADDRFAMILY
+	case EAI_ADDRFAMILY:
+#endif
 		return EAFNOSUPPORT;
 	case EAI_MEMORY:
 		return ENOMEM;
@@ -60,6 +67,10 @@ static int netdb_errno (int code)
 		return errno;
 	case EAI_OVERFLOW:
 		return EOVERFLOW;
+#ifdef EAI_INTR
+	case EAI_INTR:
+		return EINTR;
+#endif
 	}
 
 	return EIO;
