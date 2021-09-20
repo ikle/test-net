@@ -58,14 +58,6 @@ static int netdb_errno (int code)
 	return EIO;
 }
 
-/*
- * The function net_connect() create the socket and connects it to the
- * address specified by node:service pair. If node is NULL, then the network
- * address will be set to the loopback interface address.
- *
- * If the node/servise name resolution, socket creation and connection
- * succeeds, socket is returned. On error, negative error code is returned.
- */
 int net_connect (int type, const char *node, const char *service)
 {
 	struct addrinfo hints, *list, *p;
@@ -96,18 +88,6 @@ int net_connect (int type, const char *node, const char *service)
 	return -errno;
 }
 
-/*
- * The function net_listen() create the socket, bind it and mark a socket as
- * passive, that is, as a socket that will be used to accept incoming
- * connection request using accept(2).
- *
- * If node is not NULL, then function assigns the address specified by node
- * to a created socket, overwise to the "wilcard address".
- *
- * If the node/servise name resolution, socket creation, bind(2)ing and
- * linten(2)ing succeeds, socket is returned. On error negative error code
- * is returned.
- */
 int net_listen (int type, const char *node, const char *service)
 {
 	struct addrinfo hints, *list, *p;
@@ -139,12 +119,6 @@ int net_listen (int type, const char *node, const char *service)
 	return -errno;
 }
 
-/*
- * The function net_set_blocking sets file to blocking or non-blocking mode.
- *
- * On success non-zero is returned. On error zero is returned and errno is
- * set appropriately.
- */
 int net_set_blocking (int fd, int blocking)
 {
 	int flags;
