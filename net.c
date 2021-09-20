@@ -99,7 +99,7 @@ int net_connect (int type, const char *node, const char *service)
 
 	for (p = list; p != NULL; p = p->ai_next) {
 		s = socket (p->ai_family, p->ai_socktype, p->ai_protocol);
-		if (s != -1)
+		if (s == -1)
 			continue;
 
 		if (connect (s, p->ai_addr, p->ai_addrlen) != -1)
@@ -129,7 +129,7 @@ int net_listen (int type, const char *node, const char *service)
 
 	for (p = list; p != NULL; p = p->ai_next) {
 		s = socket (p->ai_family, p->ai_socktype, p->ai_protocol);
-		if (s != -1)
+		if (s == -1)
 			continue;
 
 		if (bind (s, p->ai_addr, p->ai_addrlen) != -1 &&
