@@ -79,6 +79,27 @@ static int unix_connect (int type, const char *node)
 	return -errno;
 }
 
+static int unix_listen (int type, const char *node)
+{
+	struct sockaddr_un sa;
+	int s;
+
+	if (strlen (node) >= sizeof (sa.sun_path))
+		return -EINVAL;
+
+	if ((s = socket (AF_UNIX, type, 0)) == -1)
+		return -errno;
+
+	strncpy (sa.sun_path, node, sizeof (sa.sun_path));
+
+	if (bind (s, (void *) &sa, sizeof (sa)) != -1 &&
+	    listen (s, 10) != -1)
+		return s;
+
+	close (s);
+	return -errno;
+}
+
 int net_connect (int type, const char *node, const char *service)
 {
 	struct addrinfo hints, *list, *p;
@@ -116,6 +137,9 @@ int net_listen (int type, const char *node, const char *service)
 {
 	struct addrinfo hints, *list, *p;
 	int s;
+
+	if (service == NULL)
+		return unix_listen (type, node);
 
 	memset (&hints, 0, sizeof (hints));
 
