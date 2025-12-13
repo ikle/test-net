@@ -34,10 +34,12 @@ libnet.a: $(NET_OBJECTS)
 
 test: $(TESTS)
 
-tls-cli: CFLAGS += `pkg-config gnutls --cflags --libs`
+tls-cli: CFLAGS += `pkg-config gnutls --cflags`
+tls-cli: LDLIBS += `pkg-config gnutls --libs`
 tls-cli: libnet.a
 
-tls-srv: CFLAGS += `pkg-config gnutls --cflags --libs`
+tls-srv: CFLAGS += `pkg-config gnutls --cflags`
+tls-srv: LDLIBS += `pkg-config gnutls --libs`
 tls-srv: libnet.a
 
 tap-tap: tap-tap.o tuntap.o
