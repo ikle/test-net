@@ -48,6 +48,8 @@ int rpc_pty_close (int dev)
 {
 	char path[36];  /* never overflows for 64-bit ints */
 
+	if (dev < 0)  return 1;  /* nothing to close */
+
 	snprintf (path, sizeof (path), "/var/run/rpc/%d", dev);
 
 	return unlink (path) == 0;
@@ -68,6 +70,8 @@ int rpc_pty_login (int dev, const char *user, const char *host)
 	struct utmpx ut;
 	struct timeval tv;
 	int ok;
+
+	if (dev < 0)  return 1;  /* nothing to log */
 
 	utmpx_init (&ut, dev, USER_PROCESS);
 	ut.ut_pid = getpid ();
@@ -92,6 +96,8 @@ int rpc_pty_logout (int dev)
 {
 	struct utmpx ut;
 	int ok;
+
+	if (dev < 0)  return 1;  /* nothing to log */
 
 	utmpx_init (&ut, dev, DEAD_PROCESS);
 
