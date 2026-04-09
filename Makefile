@@ -13,6 +13,7 @@ TARGETS = libnet.a tuntap.o
 TARGETS += test
 
 NET_OBJECTS = net.o tls.o bipbuf.o packet-buf.o route.o netif.o net-util.o
+NET_OBJECTS += rpc-account.o
 
 TESTS = tls-cli tls-srv tap-tap route-list route-edit route-default-device
 TESTS += netif-test netif-info netif-set
